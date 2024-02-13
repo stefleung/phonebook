@@ -14,12 +14,18 @@ app.use(
   morgan(":method :url :status :res[content-length] - :response-time ms :body")
 );
 
-const info = () => `<p>Phonebook has info for ${persons.length} people</p>
-<p>${Date()}</p>
-`;
-
-app.get("/info", (request, response) => {
-  response.send(info());
+app.get("/info", (request, response, next) => {
+  const info = (persons) => `
+    <p>
+      Phonebook has info for ${persons.length} people
+    </p>
+    <p>${Date()}</p>
+  `;
+  Person.find({})
+    .then((persons) => {
+      response.send(info(persons));
+    })
+    .catch((error) => next(error));
 });
 
 app.get("/api/persons", (request, response) => {
